@@ -46,9 +46,9 @@ export default function Home({
           ))}
         </ul> */}
         <ul>
-          {restaurants.map(({ name, description }) => (
+          {restaurants.map(({ name,id }) => (
             <li className={utilStyles.listItem} key={name}>
-              <Link href={`/posts/${name}`}>{name}</Link>
+              <Link href={`/restaurants/${id}`}>{name}</Link>
               <br />
               
             </li>
@@ -69,13 +69,17 @@ export const getStaticProps: GetStaticProps = async () => {
 
   const restaurantsRes = await fetchAPI("/restaurants");
 
-  const allPostsData = getSortedPostsData();
   const date = new Date();
   console.log(restaurantsRes.data.map(r => r.attributes));
   return {
     props: {
-      allPostsData,
-      restaurants: restaurantsRes.data.map(r => r.attributes),
+      restaurants: restaurantsRes.data.map(r => {
+        return {
+          name: r.attributes.name,
+          id: r.id,
+          updatedAt: r.attributes.updatedAt
+        }
+      }),
       date: date.toDateString() + ' ' + date.toLocaleTimeString()
     }
   }
