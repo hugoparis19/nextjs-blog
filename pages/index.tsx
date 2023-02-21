@@ -3,17 +3,20 @@ import Head from 'next/head'
 import Link from 'next/link'
 import DateCompo from '../components/date'
 import Layout, { siteTitle } from '../components/layout'
+import Timer from '../components/timer'
 import { getSortedPostsData } from '../lib/posts'
+import { fetchAPI } from "../lib/strapi"
 import utilStyles from '../styles/utils.module.css'
 
 export default function Home({
-  allPostsData, date
+  allPostsData,restaurants, date
 }: {
   allPostsData: {
     date: string
     title: string
     id: string
   }[],
+  restaurants: []
   date:  string,
 }) {
   return (
@@ -21,17 +24,17 @@ export default function Home({
       <Head>
         <title>{siteTitle}</title>
       </Head>
-      <section className={utilStyles.headingMd}>
+      {/* <section className={utilStyles.headingMd}>
         <p>[Your Self Introduction]</p>
         <div>{date }</div>
         <p>
           (This is a sample website - you’ll be building a site like this in{' '}
           <a href="https://nextjs.org/learn">our Next.js tutorial</a>.)
         </p>
-      </section>
+      </section> */}
       <section className={`${utilStyles.headingMd} ${utilStyles.padding1px}`}>
-        <h2 className={utilStyles.headingLg}>Blog</h2>
-        <ul className={utilStyles.list}>
+        <h2 className={utilStyles.headingLg}>Restaurants</h2>
+        {/* <ul className={utilStyles.list}>
           {allPostsData.map(({ id, date, title }) => (
             <li className={utilStyles.listItem} key={id}>
               <Link href={`/posts/${id}`}>{title}</Link>
@@ -41,19 +44,38 @@ export default function Home({
               </small>
             </li>
           ))}
+        </ul> */}
+        <ul>
+          {restaurants.map(({ name, description }) => (
+            <li className={utilStyles.listItem} key={name}>
+              <Link href={`/posts/${name}`}>{name}</Link>
+              <br />
+              
+            </li>
+          ))}
         </ul>
+        <Timer />
       </section>
     </Layout>
   )
 }
 
 export const getStaticProps: GetStaticProps = async () => {
+  // Run API calls in parallel
+  // const [restaurantsRes, categoriesRes] = await Promise.all([
+  //   fetchAPI("/restaurants"),
+  //   fetchAPI("/categories")    
+  // ]);
+
+  const restaurantsRes = await fetchAPI("/restaurants");
+
   const allPostsData = getSortedPostsData();
   const date = new Date();
-  console.log(date);
+  console.log(restaurantsRes.data.map(r => r.attributes));
   return {
     props: {
       allPostsData,
+      restaurants: restaurantsRes.data.map(r => r.attributes),
       date: date.toDateString() + ' ' + date.toLocaleTimeString()
     }
   }
