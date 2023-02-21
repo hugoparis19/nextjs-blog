@@ -31,10 +31,8 @@ export default function Post({
 }
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  
   const restaurantsRes = await fetchAPI("/restaurants");
-  const allIds= restaurantsRes.data.map(r => r.id);
-  
+  const allIds= restaurantsRes.data.map(r => r.id);  
   const paths = allIds.map(id => { return { params: { id: id.toString() } } });	
   return {
     paths,
@@ -43,9 +41,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
 }
 
 export const getStaticProps: GetStaticProps = async ({ params }) => {
-  
   const restaurantsRes = await fetchAPI("/restaurants"+`/${params?.id}`);
-
   const restaurantData = {
     id: restaurantsRes.data.id,
     name: restaurantsRes.data.attributes.name,
